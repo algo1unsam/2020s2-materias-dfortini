@@ -1,0 +1,103 @@
+import carrera.*
+import materias.*
+import estudiante.*
+
+describe "universidad" {
+
+	var roque
+	var nico
+	var emi
+	var programacion
+	var medicina
+	var derecho
+	var objetos1
+	var mate1
+	var quimica
+	var latin
+	var objetos2
+
+	fixture {
+		roque = new Estudiante()
+		nico = new Estudiante()
+		emi = new Estudiante()
+		programacion = new Carrera()
+		medicina = new Carrera()
+		derecho = new Carrera()
+		objetos1 = new Materia()
+		mate1 = new Materia()
+		quimica = new Materia()
+		latin = new Materia()
+		objetos2 = new Materia()
+		programacion.addMateria(objetos1)
+		programacion.addMateria(mate1)
+		programacion.addMateria(objetos2)
+		medicina.addMateria(quimica)
+		derecho.addMateria(latin)
+		roque.carreras().add(programacion)
+		roque.carreras().add(medicina)
+		objetos2.correlativas().add(objetos1)
+		objetos2.correlativas().add(mate1)
+	}
+
+	test "roque y nico aprueban objetos 1" {
+		roque.aproboMateria(objetos1, 9)
+		assert.that(roque.materiasAprobadas().size() == 1)
+		nico.aproboMateria(objetos1, 9)
+		assert.that(nico.materiasAprobadas().size() == 1)
+		roque.aproboMateria(mate1, 8)
+		assert.that(roque.materiasAprobadas().size() == 2)
+		assert.equals(8.5, roque.promedio())
+	}
+
+	test "roque intenta guardar una materia q no aprobo" {
+		assert.throwsException({ roque.aproboMateria(mate1, 3)})
+	}
+
+	test "promedio de estudiante que no aprobo ninguna materia" {
+		assert.throwsException({ emi.promedio()})
+	}
+
+	test "verifico que roque aprobo objetos 1" {
+		roque.aproboMateria(objetos1, 9)
+		assert.that(roque.tieneAprobada(objetos1))
+	}
+
+	test "verificar que roque ya aprobo objetos 1" {
+		roque.aproboMateria(objetos1, 9)
+		assert.throwsException({ roque.aproboMateria(objetos1, 6)})
+	}
+
+	test "roque se quiere inscirbir a una materia que no puede porque es de otra carrera" {
+		assert.notThat(roque.puedeInscribirseA(latin))
+	}
+
+	test "roque se quiere inscirbir a una materia que no puede porque ya la aprobo" {
+		roque.aproboMateria(objetos1, 9)
+		assert.notThat(roque.puedeInscribirseA(objetos1))
+	}
+	
+	test "roque quiere inscribirse a una materia en la que ya esta inscripto" {
+		roque.inscribirseA(objetos1)
+		assert.notThat(roque.puedeInscribirseA(objetos1))
+	}
+	
+	test "roque quiere inscribirse a una materia que no puede por correlativa" {
+		assert.notThat(roque.puedeInscribirseA(objetos2))
+	}
+	
+	test "roque puede inscribirse a objetos 2 porque tiene cumple todos lops requisitos" {
+		roque.aproboMateria(objetos1, 9)
+		roque.aproboMateria(mate1, 9)
+		assert.that(roque.puedeInscribirseA(objetos2))
+	}
+	
+
+//	test "roque esta inscripto en mate1, objetos1 y qumica" {
+//		roque.inscribirseA(mate1)
+//		roque.inscribirseA(objetos1)
+//		roque.inscribirseA(quimica)
+//		
+//		assert.equals(3, roque.materiasInscriptas())
+//	}
+}
+
