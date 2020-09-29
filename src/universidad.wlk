@@ -1,0 +1,5 @@
+
+object universidad {
+	var carreras = []	
+	
+}
